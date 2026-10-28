@@ -64,7 +64,7 @@ def init_db():
     ''')
 
     # Insert default settings
-    cursor.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('active_mode', 'LIVE')")
+    cursor.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('active_mode', 'DEMO')")
 
     # Insert default sensor nodes
     cursor.execute("INSERT OR IGNORE INTO sensor_nodes VALUES ('node_energy', 'Main Office Energy Node', 'PZEM-004T', 3500.0, 1.0)")

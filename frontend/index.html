@@ -103,7 +103,7 @@
                         <span class="mode-label">System Mode:</span>
                         <div class="mode-toggle-indicator" id="mode-indicator-pill">
                             <span class="pulse-indicator"></span>
-                            <span id="mode-text">LIVE IoT MODE</span>
+                            <span id="mode-text">DEMO CSV MODE</span>
                         </div>
                     </div>
 
@@ -490,26 +490,18 @@ node_energy,3900.2,,2026-08-01 11:00:00</pre>
 
                     <!-- Protected Settings Content -->
                     <div class="settings-content" id="settings-form-wrapper">
-                        <h2><i class="fa-solid fa-sliders text-glow-cyan mr-2"></i>System Thresholds & IoT Mode</h2>
-                        <p class="description-text">Calibrate sensor thresholds, toggle live hardware integration vs demo mode, and configure alerts.</p>
+                        <h2><i class="fa-solid fa-sliders text-glow-cyan mr-2"></i>System Thresholds & Demo Mode</h2>
+                        <p class="description-text">Calibrate sensor thresholds and configure alerts for uploaded demo data.</p>
 
                         <div class="settings-group">
                             <h3>Operating Mode</h3>
                             <div class="mode-selector-radio">
                                 <label class="radio-label">
-                                    <input type="radio" name="system-mode" value="live" id="mode-live" checked>
+                                    <input type="radio" name="system-mode" value="demo" id="mode-demo" checked disabled>
                                     <span class="custom-radio"></span>
                                     <div class="radio-text">
-                                        <strong>Live IoT Hardware Ingestion</strong>
-                                        <p>Receives real HTTP POST telemetry payloads from connected ESP32 microcontrollers.</p>
-                                    </div>
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="system-mode" value="demo" id="mode-demo">
-                                    <span class="custom-radio"></span>
-                                    <div class="radio-text">
-                                        <strong>Interactive Demo Simulation</strong>
-                                        <p>Generates realistic continuous building telemetry data automatically for testing.</p>
+                                        <strong>Demo CSV Mode (Always Active)</strong>
+                                        <p>Upload historical sensor CSV readings to display dashboard data. Live IoT mode is disabled.</p>
                                     </div>
                                 </label>
                             </div>

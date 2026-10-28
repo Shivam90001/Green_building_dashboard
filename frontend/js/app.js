@@ -634,15 +634,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await res.json();
 
             // Set system mode
-            if (data.mode === 'live') {
-                document.getElementById("mode-live").checked = true;
-                modeIndicatorPill.classList.remove("demo-mode");
-                modeText.textContent = "LIVE IoT MODE";
-            } else {
-                document.getElementById("mode-demo").checked = true;
-                modeIndicatorPill.classList.add("demo-mode");
-                modeText.textContent = "DEMO SIMULATION";
-            }
+            document.getElementById("mode-demo").checked = true;
+            modeIndicatorPill.classList.add("demo-mode");
+            modeText.textContent = "DEMO CSV MODE";
 
             // Set Sensor Thresholds
             if (data.nodes) {
@@ -666,9 +660,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (btnSaveSettings) {
         btnSaveSettings.addEventListener("click", async () => {
-            const selectedMode = document.querySelector('input[name="system-mode"]:checked').value;
             const settingsPayload = {
-                mode: selectedMode,
                 nodes: {
                     node_energy: {
                         threshold: parseFloat(document.getElementById("input-thresh-energy").value),

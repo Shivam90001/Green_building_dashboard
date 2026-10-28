@@ -154,48 +154,12 @@ def get_session():
         return jsonify({"logged_in": True, "username": session['username']})
     return jsonify({"logged_in": False})
 
-# Ingest Live IoT Data (ESP32 HTTP POST)
 @app.route('/api/iot/ingest', methods=['POST'])
 def ingest_iot():
-    data = request.json or {}
-    node_id = data.get('node_id')
-    value1 = data.get('value1') # energy: Watts, water: L/min, climate: Temp
-    value2 = data.get('value2') # climate: Humidity, else None
-
-    if not node_id or value1 is None:
-        return jsonify({"success": False, "message": "Invalid payload parameters"}), 400
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    # Verify node exists
-    cursor.execute("SELECT calibration_factor FROM sensor_nodes WHERE node_id = ?", (node_id,))
-    node = cursor.fetchone()
-    if not node:
-        conn.close()
-        return jsonify({"success": False, "message": "Unknown sensor node"}), 404
-
-    # Apply calibration factor
-    calibrated_val1 = float(value1) * node['calibration_factor']
-    calibrated_val2 = float(value2) * node['calibration_factor'] if value2 is not None else None
-
-    # Get current mode
-    cursor.execute("SELECT value FROM settings WHERE key = 'active_mode'")
-    mode = cursor.fetchone()['value']
-
-    # Save reading
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    cursor.execute("""
-        INSERT INTO sensor_readings (node_id, value1, value2, mode, timestamp)
-        VALUES (?, ?, ?, ?, ?)
-    """, (node_id, calibrated_val1, calibrated_val2, mode, timestamp))
-    conn.commit()
-
-    # Check alert threshold
-    check_thresholds(conn, node_id, calibrated_val1, calibrated_val2)
-
-    conn.close()
-    return jsonify({"success": True, "message": "Data ingested successfully"})
+    return jsonify({
+        "success": False,
+        "message": "Live IoT ingestion is disabled. Use Demo CSV mode."
+    }), 403
 
 # CSV Data Upload (Demo / Legacy Mode)
 @app.route('/api/demo/upload', methods=['POST'])
@@ -239,7 +203,7 @@ def upload_csv():
 
         conn.commit()
         conn.close()
-        return jsonify({"success": True, "message": f"Successfully imported {imported_count} historical records. Switch to DEMO mode to visualize."})
+        return jsonify({"success": True, "message": f"Successfully imported {imported_count} historical records. Open the dashboard to visualize them."})
     except Exception as e:
         return jsonify({"success": False, "message": f"Error parsing CSV: {str(e)}"}), 500
 
@@ -474,14 +438,12 @@ def handle_settings():
             return jsonify({"success": False, "message": "Unauthorized"}), 401
 
         data = request.json or {}
-        mode = data.get('mode')
         sensors = data.get('sensors') # Array of sensor config objects
 
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        if mode in ['LIVE', 'DEMO']:
-            cursor.execute("UPDATE settings SET value = ? WHERE key = 'active_mode'", (mode,))
+        cursor.execute("UPDATE settings SET value = 'DEMO' WHERE key = 'active_mode'")
 
         if sensors:
             for s in sensors:

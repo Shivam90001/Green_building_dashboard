@@ -1,19 +1,19 @@
-# Green Building Performance Dashboard (Dual Mode)
+# Green Building Performance Dashboard (Demo CSV Mode)
 
 A premium, state-of-the-art college final year project representing the convergence of **Computer Science Engineering (CSE)** and **BCA Business Information Systems**.
 
 This repository contains two complete implementations:
-1. **Desktop App Edition (Python & SQLite)**: A local version running on your PC, launched via a custom Desktop shortcut. It runs a backend Flask server, uses a self-contained SQLite database, and features a responsive dashboard UI.
+1. **Desktop App Edition (Python & SQLite)**: A local Flask dashboard using a self-contained SQLite database and CSV demo data.
 2. **College Submission Edition (PHP & MySQL)**: Located in the `college_php_mysql_code/` directory, designed for hosting on a local server like XAMPP to match your project documentation perfectly.
 
 ---
 
 ## Key Features
 
-- **Dual-Mode Data Acquisition**: Seamlessly toggle between **Live IoT Mode** (real-time HTTP POST JSON payloads) and **Demo/Historical Mode** (CSV spreadsheet parsing).
+- **Demo Data Acquisition**: Upload historical sensor readings from a CSV file. Demo mode is always active.
 - **Interdisciplinary Scoring Algorithm**: Computes a scientific **Building Efficiency Score (1-100)** derived from ASHRAE 55 and LEED v4.1 criteria:
   $$BES = 0.50 \times Energy\_Score + 0.30 \times Water\_Score + 0.20 \times Climate\_Score$$
-- **Hardware Integration Simulation**: Python mock script simulating ESP32 microcontrollers streaming PZEM-004T (energy), YF-S201 (water), and DHT11 (temperature & humidity) logs.
+- **Sample Sensor Data**: Includes readings for energy, water, temperature, and humidity sensors.
 - **Glassmorphic Analytical UI**: Highly responsive web frontend featuring floating frosted-glass panels, interactive metric scales, and real-time Chart.js line charts.
 - **Compliance Auditor**: Native PDF rendering script exporting dynamic reports and active charts.
 - **Admin Configuration Security**: Encrypted administrative lock to prevent unauthorized calibration changes.
@@ -39,14 +39,8 @@ Alternatively, you can run the launcher manually:
    ```
 This starts the Flask server on port 5000 in a separate console and opens the interface in a standalone window. Close the `EcoBuildServer` console to stop the server.
 
-### 3. Simulate ESP32 IoT Nodes
-To demonstrate **Live IoT Mode** running with real-time data:
-1. Open another command prompt in the project folder.
-2. Run the simulator script:
-   ```cmd
-   py mock_iot\esp32_simulator.py
-   ```
-The simulator will immediately start streaming realistic readings (representing energy, water, and climate) to your dashboard every 5 seconds. You will see the metrics and charts update live!
+### 3. Upload Demo CSV Data
+In the dashboard, open **CSV Ingestion** and upload [dashboard_upload_ready.csv](dashboard_upload_ready.csv). Demo mode stays active and the imported readings appear on the Dashboard tab.
 
 ### 4. Log In as Administrator
 To adjust alert thresholds or modify calibration parameters:
