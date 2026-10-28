@@ -321,23 +321,23 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- DATA FETCHING & API INTERFACES ---
     async function fetchStats() {
         try {
-            const res = await fetch('/api/stats');
-            if (!res.ok) return;
+            const res = await fetch('/api/dashboard/stats');
+            if (!res.ok) throw new Error(`Dashboard stats request failed: ${res.status}`);
             const data = await res.json();
+            const readings = data.latest_readings;
+            const scores = data.scores;
 
-            // Render Real-time metrics
-            valEnergy.textContent = data.energy.value.toFixed(1);
-            scoreEnergy.textContent = `${data.energy.score}/100`;
+            valEnergy.textContent = readings.energy.val.toFixed(1);
+            scoreEnergy.textContent = `${scores.energy_score}/100`;
 
-            valWater.textContent = data.water.value.toFixed(1);
-            scoreWater.textContent = `${data.water.score}/100`;
+            valWater.textContent = readings.water.val.toFixed(1);
+            scoreWater.textContent = `${scores.water_score}/100`;
 
-            valTemp.textContent = data.climate.temp.toFixed(1);
-            scoreClimate.textContent = `${data.climate.score}/100`;
-            valHumidity.textContent = `${data.climate.humidity.toFixed(1)}%`;
+            valTemp.textContent = readings.climate.temp.toFixed(1);
+            scoreClimate.textContent = `${scores.climate_score}/100`;
+            valHumidity.textContent = `${readings.climate.humidity.toFixed(1)}%`;
 
-            // Carbon emissions calculated: standard coefficient 0.82 kg CO2 / kWh
-            const carbonKg = ((data.energy.value / 1000) * 0.82).toFixed(2);
+            const carbonKg = data.carbon_saved_kg.toFixed(2);
             valCarbon.textContent = carbonKg;
 
             // Trees saved
@@ -347,35 +347,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Sustainability Goals Update
             const energyLimit = 3500;
-            const energyPct = Math.min(100, Math.round((data.energy.value / energyLimit) * 100));
+            const energyPct = Math.min(100, Math.round((readings.energy.val / energyLimit) * 100));
             const energyGoalProg = document.getElementById("energy-goal-progress");
             if (energyGoalProg) {
                 energyGoalProg.style.width = `${energyPct}%`;
                 energyGoalProg.style.background = energyPct > 90 ? 'var(--neon-red)' : (energyPct > 75 ? 'var(--neon-amber)' : 'var(--neon-green)');
             }
             const energyGoalCurr = document.getElementById("energy-goal-curr");
-            if (energyGoalCurr) energyGoalCurr.textContent = `${data.energy.value.toFixed(0)} W`;
+            if (energyGoalCurr) energyGoalCurr.textContent = `${readings.energy.val.toFixed(0)} W`;
             const energyGoalPctEl = document.getElementById("energy-goal-pct");
             if (energyGoalPctEl) energyGoalPctEl.textContent = `${energyPct}% used`;
 
             const waterLimit = 25;
-            const waterPct = Math.min(100, Math.round((data.water.value / waterLimit) * 100));
+            const waterPct = Math.min(100, Math.round((readings.water.val / waterLimit) * 100));
             const waterGoalProg = document.getElementById("water-goal-progress");
             if (waterGoalProg) {
                 waterGoalProg.style.width = `${waterPct}%`;
                 waterGoalProg.style.background = waterPct > 90 ? 'var(--neon-red)' : 'var(--neon-cyan)';
             }
             const waterGoalCurr = document.getElementById("water-goal-curr");
-            if (waterGoalCurr) waterGoalCurr.textContent = `${data.water.value.toFixed(1)} L/m`;
+            if (waterGoalCurr) waterGoalCurr.textContent = `${readings.water.val.toFixed(1)} L/m`;
             const waterGoalPctEl = document.getElementById("water-goal-pct");
             if (waterGoalPctEl) waterGoalPctEl.textContent = `${waterPct}% used`;
 
             // Overall Score
-            setBuildingScore(data.building_score);
+            setBuildingScore(scores.building_score);
 
-            // Anomaly Badge Count
-            badgeAlertsCount.textContent = data.active_anomalies_count;
-            if (data.active_anomalies_count > 0) {
+            badgeAlertsCount.textContent = data.unresolved_alerts;
+            if (data.unresolved_alerts > 0) {
                 badgeAlertsCount.style.display = "inline-block";
             } else {
                 badgeAlertsCount.style.display = "none";
@@ -387,27 +386,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function fetchCharts() {
         try {
-            const res = await fetch('/api/charts');
-            if (!res.ok) return;
+            const res = await fetch('/api/dashboard/charts');
+            if (!res.ok) throw new Error(`Dashboard charts request failed: ${res.status}`);
             const data = await res.json();
 
-            // Update Chart datasets
             if (chartEnergy) {
-                chartEnergy.data.labels = data.energy.labels;
-                chartEnergy.data.datasets[0].data = data.energy.values;
+                chartEnergy.data.labels = data.labels;
+                chartEnergy.data.datasets[0].data = data.energy;
                 chartEnergy.update();
             }
 
             if (chartWater) {
-                chartWater.data.labels = data.water.labels;
-                chartWater.data.datasets[0].data = data.water.values;
+                chartWater.data.labels = data.labels;
+                chartWater.data.datasets[0].data = data.water;
                 chartWater.update();
             }
 
             if (chartClimate) {
-                chartClimate.data.labels = data.climate.labels;
-                chartClimate.data.datasets[0].data = data.climate.temp;
-                chartClimate.data.datasets[1].data = data.climate.humidity;
+                chartClimate.data.labels = data.labels;
+                chartClimate.data.datasets[0].data = data.temp;
+                chartClimate.data.datasets[1].data = data.humidity;
                 chartClimate.update();
             }
         } catch (err) {
@@ -420,20 +418,21 @@ document.addEventListener("DOMContentLoaded", () => {
             const res = await fetch('/api/alerts');
             if (!res.ok) return;
             const data = await res.json();
+            const activeAlerts = data.filter(item => !item.resolved);
 
             const tbody = document.getElementById("alerts-tbody");
-            activeAlertsTag.textContent = `${data.length} Active Anomalies`;
+            activeAlertsTag.textContent = `${activeAlerts.length} Active Anomalies`;
 
-            if (data.length === 0) {
+            if (activeAlerts.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" class="text-center">No anomalies registered. Systems functioning normally.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = data.map(item => `
+            tbody.innerHTML = activeAlerts.map(item => `
                 <tr>
-                    <td><span class="badge-outline-danger">${item.severity}</span></td>
+                    <td><span class="badge-outline-danger">Alert</span></td>
                     <td><strong>${item.node_id}</strong></td>
-                    <td>${item.value}</td>
+                    <td>${item.reading_value}</td>
                     <td>${item.threshold}</td>
                     <td>${item.timestamp}</td>
                     <td><span class="badge-outline-danger">Triggered</span></td>
