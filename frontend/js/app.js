@@ -551,7 +551,7 @@ document.addEventListener("DOMContentLoaded", () => {
             btnSubmitCsv.setAttribute("disabled", "true");
 
             try {
-                const res = await fetch('/api/upload', {
+                const res = await fetch('/api/demo/upload', {
                     method: 'POST',
                     body: formData
                 });
