@@ -40,8 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const scoreClimate = document.getElementById("score-climate");
     const valCarbon = document.getElementById("val-carbon");
     const valHumidity = document.getElementById("val-humidity");
-    const badgeAlertsCount = document.getElementById("badge-alerts-count");
-    const activeAlertsTag = document.getElementById("active-alerts-tag");
     const modeIndicatorPill = document.getElementById("mode-indicator-pill");
     const modeText = document.getElementById("mode-text");
 
@@ -141,12 +139,10 @@ document.addEventListener("DOMContentLoaded", () => {
             // Adjust page title
             const titleMap = {
                 dashboard: "Ecological Analytics",
-                alerts: "Live System Alerts",
                 upload: "CSV Audit Ingestion",
                 leed: "LEED Design Certifier",
                 logs: "Database Logs Explorer",
                 settings: "Configuration Panels",
-                about: "System Architecture"
             };
             document.getElementById("page-title").textContent = titleMap[targetTab] || "EcoBuild Dashboard";
 
@@ -155,8 +151,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 fetchStats();
                 fetchCharts();
                 setTimeout(resizeAllCharts, 150);
-            } else if (targetTab === "alerts") {
-                fetchAlerts();
             } else if (targetTab === "settings") {
                 fetchSettings();
             } else if (targetTab === "logs") {
@@ -373,12 +367,6 @@ document.addEventListener("DOMContentLoaded", () => {
             // Overall Score
             setBuildingScore(scores.building_score);
 
-            badgeAlertsCount.textContent = data.unresolved_alerts;
-            if (data.unresolved_alerts > 0) {
-                badgeAlertsCount.style.display = "inline-block";
-            } else {
-                badgeAlertsCount.style.display = "none";
-            }
         } catch (err) {
             console.warn("Telemetry fetch stats error:", err);
         }
@@ -412,49 +400,6 @@ document.addEventListener("DOMContentLoaded", () => {
             console.warn("Telemetry fetch charts error:", err);
         }
     }
-
-    async function fetchAlerts() {
-        try {
-            const res = await fetch('/api/alerts');
-            if (!res.ok) return;
-            const data = await res.json();
-            const activeAlerts = data.filter(item => !item.resolved);
-
-            const tbody = document.getElementById("alerts-tbody");
-            activeAlertsTag.textContent = `${activeAlerts.length} Active Anomalies`;
-
-            if (activeAlerts.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center">No anomalies registered. Systems functioning normally.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = activeAlerts.map(item => `
-                <tr>
-                    <td><span class="badge-outline-danger">Alert</span></td>
-                    <td><strong>${item.node_id}</strong></td>
-                    <td>${item.reading_value}</td>
-                    <td>${item.threshold}</td>
-                    <td>${item.timestamp}</td>
-                    <td><span class="badge-outline-danger">Triggered</span></td>
-                    <td>
-                        <button class="action-link-btn" onclick="dismissAlert(${item.id})">Acknowledge</button>
-                    </td>
-                </tr>
-            `).join("");
-        } catch (err) {
-            console.warn("Alerts fetch error:", err);
-        }
-    }
-
-    window.dismissAlert = async function(id) {
-        try {
-            await fetch(`/api/alerts/${id}/dismiss`, { method: 'POST' });
-            fetchAlerts();
-            fetchStats();
-        } catch (err) {
-            console.error("Failed to dismiss alert:", err);
-        }
-    };
 
     async function fetchLogs() {
         try {

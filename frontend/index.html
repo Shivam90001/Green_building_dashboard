@@ -39,11 +39,6 @@
                         <i class="fa-solid fa-chart-line"></i>
                         <span>Dashboard</span>
                     </li>
-                    <li data-tab="alerts">
-                        <i class="fa-solid fa-bell"></i>
-                        <span>Live Alerts</span>
-                        <span class="badge badge-danger alert-badge-count" id="badge-alerts-count">0</span>
-                    </li>
                     <li data-tab="upload">
                         <i class="fa-solid fa-file-csv"></i>
                         <span>CSV Ingestion</span>
@@ -59,10 +54,6 @@
                     <li data-tab="settings">
                         <i class="fa-solid fa-gears"></i>
                         <span>Configurations</span>
-                    </li>
-                    <li data-tab="about">
-                        <i class="fa-solid fa-circle-info"></i>
-                        <span>System Architecture</span>
                     </li>
                 </ul>
             </nav>
@@ -287,36 +278,6 @@
                         <div class="chart-body" style="height: 250px;">
                             <canvas id="chart-climate"></canvas>
                         </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Alerts View -->
-            <section class="tab-panel" id="tab-alerts">
-                <div class="card container-card">
-                    <div class="card-header-actions">
-                        <h2><i class="fa-solid fa-triangle-exclamation text-glow-red mr-2"></i>Real-time Anomaly Alerts</h2>
-                        <span class="table-info-counter" id="active-alerts-tag">0 Active Anomalies</span>
-                    </div>
-                    <div class="table-container">
-                        <table class="data-table" id="alerts-table">
-                            <thead>
-                                <tr>
-                                    <th>Severity</th>
-                                    <th>Node ID</th>
-                                    <th>Metric Value</th>
-                                    <th>Threshold</th>
-                                    <th>Time Detected</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="alerts-tbody">
-                                <tr>
-                                    <td colspan="7" class="text-center">No anomalies registered. Systems functioning normally.</td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
                 </div>
             </section>
@@ -582,58 +543,6 @@ node_energy,3900.2,,2026-08-01 11:00:00</pre>
                 </div>
             </section>
 
-            <!-- System Architecture & About View -->
-            <section class="tab-panel" id="tab-about">
-                <div class="card container-card">
-                    <h2><i class="fa-solid fa-circle-info text-glow-green mr-2"></i>Interdisciplinary Project Architecture</h2>
-                    <p class="subtitle-text">Convergence of Computer Science Engineering (CSE) and BCA Business Applications</p>
-
-                    <div class="architecture-grid">
-                        <div class="arch-col">
-                            <h3><i class="fa-solid fa-microchip text-glow-amber mr-2"></i>CSE Focus (Hardware & Core Backend)</h3>
-                            <ul>
-                                <li><strong>Low-level Hardware Node:</strong> Microcontroller interface integration of PZEM-004T (Electrical load), YF-S201 (Flow velocity), and DHT11 (Thermal indices).</li>
-                                <li><strong>Ingestion API (JSON):</strong> RESTful endpoint developed to ingest HTTP POST payloads streamed via ESP32 Wi-Fi modules securely.</li>
-                                <li><strong>Data Persistence:</strong> SQLite3 time-series database optimized for lightning-fast reads under continuous write loads.</li>
-                                <li><strong>Mathematical Score Engine:</strong> Live computation logic evaluating complex metrics normalization against ASHRAE targets.</li>
-                            </ul>
-                        </div>
-                        <div class="arch-col">
-                            <h3><i class="fa-solid fa-chart-pie text-glow-cyan mr-2"></i>BCA Focus (Logic Flow & Business Auditing)</h3>
-                            <ul>
-                                <li><strong>Analytical UI Engine:</strong> High-performance frontend designed with vanilla CSS glassmorphism grids and responsive CSS transitions.</li>
-                                <li><strong>Visual Rendering:</strong> Seamless integrations of Chart.js to map live dynamic line charts and double-axis layouts.</li>
-                                <li><strong>Demo Data Parser:</strong> Client/server CSV ingestion tool to process historical data files for baseline carbon comparison.</li>
-                                <li><strong>Compliance Auditor:</strong> Automated client-side PDF export system generating professional LEED documentation summaries.</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="formula-section">
-                        <h3><i class="fa-solid fa-calculator text-glow-violet mr-2"></i>Mathematical Formulation of Building Efficiency Score (BES)</h3>
-                        <p class="formula-intro">The interdisciplinary scoring grade is calculated scientifically on a scale of 1 &ndash; 100 using environmental engineer targets:</p>
-
-                        <div class="equation-box">
-                            $$BES = 0.50 \times ES + 0.30 \times WS + 0.20 \times CS$$
-                        </div>
-
-                        <div class="formula-variables">
-                            <div class="var-item">
-                                <strong>ES (Energy Score)</strong>
-                                <p>Normalizes current Active Power (W) against user-defined alert thresholds. Drops progressively when threshold is violated to represent higher carbon loading.</p>
-                            </div>
-                            <div class="var-item">
-                                <strong>WS (Water Score)</strong>
-                                <p>Normalizes current water flow speed (L/m) against limit thresholds. Measures utility performance and flags continuous leakage patterns.</p>
-                            </div>
-                            <div class="var-item">
-                                <strong>CS (Climate Score)</strong>
-                                <p>Evaluates Thermal Comfort Indices (Temperature & Humidity) using ASHRAE Standard 55 thermal comfort ranges (Ideal Temp: 20&deg;C&ndash;25&deg;C, Humidity: 30%&ndash;60%). Deviations trigger penalty calculations.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
         </main>
     </div>
 
