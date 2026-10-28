@@ -527,6 +527,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (e.dataTransfer.files.length) {
                 csvFileInput.files = e.dataTransfer.files;
                 handleSelectedFile();
+                uploadCsvFile();
             }
         });
 
@@ -541,32 +542,39 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    if (btnSubmitCsv) {
-        btnSubmitCsv.addEventListener("click", async () => {
-            if (!csvFileInput.files.length) return;
-            const formData = new FormData();
-            formData.append("file", csvFileInput.files[0]);
+    async function uploadCsvFile() {
+        if (!csvFileInput.files.length || btnSubmitCsv.disabled) return;
 
-            btnSubmitCsv.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Ingesting dataset...`;
-            btnSubmitCsv.setAttribute("disabled", "true");
+        const formData = new FormData();
+        formData.append("file", csvFileInput.files[0]);
+        btnSubmitCsv.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Ingesting dataset...`;
+        btnSubmitCsv.disabled = true;
 
-            try {
-                const res = await fetch('/api/demo/upload', {
-                    method: 'POST',
-                    body: formData
-                });
-                const result = await res.json();
-                alert(result.message || "CSV ingested successfully!");
-                csvFileName.textContent = "No file selected";
-                csvDropzone.classList.remove("has-file");
-                csvFileInput.value = "";
-                fetchStats();
-            } catch (err) {
-                alert("Failed to process CSV file.");
-            } finally {
-                btnSubmitCsv.innerHTML = `<i class="fa-solid fa-square-check"></i> <span>Start CSV Ingestion Process</span>`;
+        try {
+            const res = await fetch('/api/demo/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await res.json();
+            if (!res.ok || !result.success) {
+                throw new Error(result.message || "Failed to process CSV file.");
             }
-        });
+
+            alert(result.message || "CSV ingested successfully!");
+            csvFileName.textContent = "No file selected";
+            csvDropzone.classList.remove("has-file");
+            csvFileInput.value = "";
+            document.querySelector('.sidebar-menu li[data-tab="dashboard"]')?.click();
+        } catch (err) {
+            alert(err.message || "Failed to process CSV file.");
+        } finally {
+            btnSubmitCsv.innerHTML = `<i class="fa-solid fa-square-check"></i> <span>Start CSV Ingestion Process</span>`;
+            btnSubmitCsv.disabled = csvFileInput.files.length === 0;
+        }
+    }
+
+    if (btnSubmitCsv) {
+        btnSubmitCsv.addEventListener("click", uploadCsvFile);
     }
 
     // --- AUTHENTICATION & LOGIN ---
